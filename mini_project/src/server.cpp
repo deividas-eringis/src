@@ -12,37 +12,33 @@ using namespace mini_project;
 bool process(Chat::Request &req, Chat::Response &res){
     if (req.update==true){
 	std::ofstream file("session.txt", std::ofstream::app);
-
 	file << req.time << "\n";
 	file << req.name << "\n";
 	file << req.msg << "\n";
 	file.close();
     }
 	std::ifstream fd("session.txt");
-	char temp[256];
-	std::string temps;
+	char temp_name[21],temp_msg[256];
 	int x;
 	while (!fd.eof()){
 	fd >> x;
-
+    fd.ignore(256,'\n');
+	fd.get(temp_name,256,'\n');
+    fd.ignore(256,'\n');
+	fd.get(temp_msg,256,'\n');
+    fd.ignore(256,'\n');
+    if (x>=req.time){
     res.time.push_back(x);
-    std::cout << x << "@"<<std::endl;
-    fd.ignore(256,'\n');
-	fd.get(temp,256,'\n');
-	res.name.push_back(temp);
-    std::cout << temp << "?" <<std::endl;
-    fd.ignore(256,'\n');
-	fd.get(temp,256,'\n');
-	res.msg.push_back(temp);
-        std::cout << temp << "!"<< std::endl;
-    fd.ignore(256,'\n');
+    res.name.push_back(temp_name);
+    res.msg.push_back(temp_msg);
+    }
+    if (res.name.size()>0&&res.msg.size()>0)
     if (res.name.back().compare("")==0&&res.msg.back().compare("")==0){
         res.time.pop_back();
         res.name.pop_back();
         res.msg.pop_back();
     }
 	}
-
 	return true;
 }
 
@@ -60,7 +56,7 @@ std::ofstream file("session.txt");
 file << std::fixed<< (int)ros::WallTime::now().toSec() << "\n" << "Server" << "\n" << "Server started"<<"\n";
 
 file.close();
-
+std::cout << "first line" << std::endl << "second line" << std::endl << "\33[1A" << "test";
   ros::ServiceServer service = n.advertiseService("chat_server",process);
   ROS_INFO("Chat server running");
   ros::spin();
