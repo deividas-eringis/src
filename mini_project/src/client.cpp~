@@ -1,0 +1,37 @@
+#include "ros/ros.h"
+#include "std_msgs/String.h"
+#include <mini_project/ChatMsg.h>
+#include <mini_project/Chat.h>
+#include <string>
+#include <math.h>
+#include <fstream>
+using namespace mini_project;
+
+int main(int argc, char **argv)
+{
+
+  ros::init(argc, argv, "chat_client");
+
+ros::NodeHandle n;
+  ros::ServiceClient client = n.serviceClient<Chat>("chat_server");
+  Chat srv;
+std::string name;
+	std::cout << "Choose a username: ";std::getline(std::cin,name);
+srv.request.name=name;
+while (ros::ok()){
+	std::cout << name << ": "; std::getline(std::cin,srv.request.msg);
+	srv.request.time=ros::WallTime::now().toSec();
+  	srv.request.update=true;
+  if (client.call(srv))
+  {
+    for (int i=0;i<100;i++) std::cout << std::endl;
+	for (int i=0;i<srv.response.num;i++)
+		std::cout << srv.response.name[i] << " "<< std::fixed<< floor(srv.response.time[i]/3600) <<":"<<floor(srv.response.time[i]%3600/60) << ":"<< floor(srv.response.time[i]%60) << "|" << srv.response.msg[i] << std::endl;
+  }
+  else
+  {
+    ROS_ERROR("Failed to reach the server");
+  }
+}
+  return 0;
+}

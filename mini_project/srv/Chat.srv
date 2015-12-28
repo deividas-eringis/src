@@ -1,0 +1,8 @@
+string name
+string msg
+int32 time
+bool update
+---
+string[] name
+string[] msg
+int32[] time
