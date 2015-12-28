@@ -11,11 +11,14 @@ using namespace mini_project;
 
 bool process(Chat::Request &req, Chat::Response &res){
     if (req.update==true){
+    if (req.name.length()>0&&req.msg.length()>0){
 	std::ofstream file("session.txt", std::ofstream::app);
 	file << req.time << "\n";
 	file << req.name << "\n";
 	file << req.msg << "\n";
 	file.close();
+	}else
+	ROS_ERROR("msg dropped");
     }
 	std::ifstream fd("session.txt");
 	char temp_name[21],temp_msg[256];

@@ -21,7 +21,6 @@ void *refresh(void *ptr)
 
         if (client.call(srv))
         {
-            std::cout << "\33[s";
             for (int i=0; i<srv.response.name.size(); i++) std::cout << "\33[1F";
             maxl=0;
             for (int i=0; i<srv.response.name.size(); i++)
@@ -32,13 +31,12 @@ void *refresh(void *ptr)
                 std::cout << "\33[0K" << std::setw(maxl) << std::left << srv.response.name[i];
                 std::cout << "|" << srv.response.msg[i] << std::endl;
             }
-            std::cout << "\33[u";
         }
         else
         {
             ROS_ERROR("Failed to reach the server");
         }
-        ros::Duration(1).sleep();
+        ros::Duration(5).sleep();
         }
 }
 
@@ -77,23 +75,22 @@ int main(int argc, char **argv)
     pthread_create (&thread, NULL, *refresh, NULL);
     while (ros::ok())
     {
-        std::cout << srv.request.name << ": ";
+       // std::cout << srv.request.name << ": ";
         std::getline(std::cin,srv.request.msg);
         srv.request.time=ros::WallTime::now().toSec();
         srv.request.update=true;
         if (client.call(srv))
         {
-        /*
-            for (int i=0; i<100; i++) std::cout << std::endl;
+            for (int i=0; i<srv.response.name.size(); i++) std::cout << "\33[1F";
+            maxl=0;
             for (int i=0; i<srv.response.name.size(); i++)
                 if (srv.response.name[i].length()>maxl)
                     maxl=srv.response.name[i].length();
             for (int i=0; i<srv.response.name.size(); i++)
             {
-                std::cout << std::setw(maxl) << std::left << srv.response.name[i];
+                std::cout << "\33[0K" << std::setw(maxl) << std::left << srv.response.name[i];
                 std::cout << "|" << srv.response.msg[i] << std::endl;
             }
-            */
         }
         else
         {
