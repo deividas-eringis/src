@@ -1,6 +1,7 @@
 string name
 string msg
 int32 time
+int32 last_update
 bool update
 ---
 string[] name

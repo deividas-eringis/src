@@ -35,7 +35,7 @@ bool process(Chat::Request &req, Chat::Response &res)
         fd.ignore(256,'\n');
         fd.get(temp_msg,256,'\n');
         fd.ignore(256,'\n');
-        if (temp_time>=req.time)
+        if (temp_time>req.last_update)
         {
             res.time.push_back(temp_time);
             res.name.push_back(temp_name);

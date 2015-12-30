@@ -158,3 +158,6 @@ target_link_libraries(server ${catkin_LIBRARIES})
 
 add_executable(client src/client.cpp)
 target_link_libraries(client ${catkin_LIBRARIES})
+
+add_dependencies(client mini_project_generate_messages_cpp)
+add_dependencies(server mini_project_generate_messages_cpp)
