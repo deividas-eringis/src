@@ -70,12 +70,10 @@ int main(int argc, char **argv)
 
 
     int maxl=0;
-    //std::thread updates(refresh,client);
     pthread_t thread;
     pthread_create (&thread, NULL, *refresh, NULL);
     while (ros::ok())
     {
-       // std::cout << srv.request.name << ": ";
         std::getline(std::cin,srv.request.msg);
         srv.request.time=ros::WallTime::now().toSec();
         srv.request.update=true;
