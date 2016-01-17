@@ -1,6 +1,5 @@
 
 #include <ros/ros.h>
-#include <tf/transform_listener.h>
 #include <math.h>
 #include <geometry_msgs/Twist.h>
 #include <move_base_msgs/MoveBaseAction.h>
@@ -44,9 +43,7 @@ bool goTo(double x, double y, float rot, bool with_set_rotation);
 void loadPoints(goalPoint points[],int &num_points);
 void loadPaths(path paths[],int &num_paths);
 void mimicPickUp();
-void getPose(geometry_msgs::PoseStamped &pMap);
 void goPath(std::string name);
-bool goPoint(std::string point_name, bool with_set_rotation);
 void ButtonCallback(kobuki_msgs::ButtonEvent event);
 
 
@@ -159,28 +156,7 @@ if (path_exists==false)
 
 
 
-bool goPoint(std::string point_name, bool with_set_rotation)
-{
-goalPoint points[MaxPoints];
-int num_points;
-loadPoints(points,num_points);
 
-bool exists=false;
-
-for (int i=0;i<num_points;i++)
-	if (point_name.compare(points[i].name)==0){
-		exists=true;
-		if (goTo(points[i].x,points[i].y,points[i].rot,with_set_rotation)==true)
-			return true;
-		else
-			return false;
-		}
-if (exists==false)
-{
-	std::cout << "Point \"" << point_name << "\" not found\n";
-	return false;
-}
-}
 
 
 
@@ -288,18 +264,11 @@ bool goTo(double x, double y, float rot, bool precise)
 {
 ros::NodeHandle n;
 MoveBaseClient ac("move_base", true);
-tf::TransformListener listener;
 
   while(!ac.waitForServer(ros::Duration(5.0))){
     ROS_INFO("Waiting for the move_base action server to come up");
   }
 move_base_msgs::MoveBaseGoal goal;
-geometry_msgs::PoseStamped pMap;
-
-double target_dist=0.14; // distance between turtlebot and perfect target position before canceling the goal.
-double dist; // variable keeping the distance betweeen perfect target and turtlebot.
-
-ros::Rate rate(10);
 
 goal.target_pose.header.frame_id = "map";
 goal.target_pose.header.stamp = ros::Time::now();
@@ -335,20 +304,7 @@ goal.target_pose.pose.orientation.z=sin(rot*3.1428/360);
 }
 
 
-void getPose(geometry_msgs::PoseStamped &pMap)
-{
-tf::TransformListener listener;
-geometry_msgs::PoseStamped pBase;
-pBase.header.frame_id = "base_link";
-pBase.pose.position.x = 0.0;
-pBase.pose.position.y = 0.0;
-pBase.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
-ros::Time current_transform = ros::Time::now();
-listener.waitForTransform("map",pBase.header.frame_id,  ros::Time(0), ros::Duration(10.0) );
-listener.getLatestCommonTime("map",pBase.header.frame_id,  current_transform, NULL);
-pBase.header.stamp = current_transform;
-listener.transformPose("map", pBase, pMap);
-}
+
 
 
 
